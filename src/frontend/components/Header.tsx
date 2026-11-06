@@ -1,24 +1,28 @@
 'use client';
 
 import React from 'react';
-import { Bot, Sparkles, ShoppingBag, ShieldAlert } from 'lucide-react';
+import { Bot, Sparkles, ShoppingBag, ShieldAlert, ChevronRight, PanelRightClose, PanelRightOpen } from 'lucide-react';
 
 interface HeaderProps {
   onOpenDiagnostics: () => void;
   onOpenCatalog: () => void;
   onOpenPolicy: () => void;
   currentThreshold: number;
+  isCopilotOpen: boolean;
+  onToggleCopilot: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onOpenDiagnostics,
   onOpenCatalog,
   onOpenPolicy,
-  currentThreshold
+  currentThreshold,
+  isCopilotOpen,
+  onToggleCopilot
 }) => {
   return (
     <header className="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-xl sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div className="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand Logo & Name */}
         <div className="flex items-center space-x-3">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-400 p-[1.5px] shadow-lg shadow-blue-500/20">
@@ -42,7 +46,7 @@ export const Header: React.FC<HeaderProps> = ({
         </div>
 
         {/* Action Controls & Live State */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2.5">
           {/* Policy Guardrails Button */}
           <button
             onClick={onOpenPolicy}
@@ -72,6 +76,29 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-sm shadow-emerald-400/50" />
             <span>PayPal Sandbox</span>
+          </button>
+
+          {/* AI Copilot Toggle Button */}
+          <button
+            onClick={onToggleCopilot}
+            className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer shadow-md ${
+              isCopilotOpen
+                ? 'bg-blue-600 text-white shadow-blue-500/25'
+                : 'bg-slate-900 hover:bg-slate-850 text-slate-300 border border-slate-800'
+            }`}
+            title="Toggle AI Copilot Sidebar"
+          >
+            {isCopilotOpen ? (
+              <>
+                <PanelRightClose className="w-3.5 h-3.5" />
+                <span>Hide Copilot</span>
+              </>
+            ) : (
+              <>
+                <PanelRightOpen className="w-3.5 h-3.5 text-sky-400" />
+                <span className="text-white">AI Copilot</span>
+              </>
+            )}
           </button>
         </div>
       </div>

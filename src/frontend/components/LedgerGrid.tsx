@@ -250,7 +250,7 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
         {/* The AG Grid Table */}
         <div 
           className="ag-theme-quartz ag-theme-quartz-dark w-full rounded-xl overflow-hidden border border-slate-800 shadow-inner"
-          style={{ height: '390px', width: '100%' }}
+          style={{ height: '460px', width: '100%' }}
         >
           <AgGridReact<LedgerTransaction>
             rowData={filteredTransactions}
