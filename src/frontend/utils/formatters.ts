@@ -34,3 +34,4 @@ export function getStatusBadgeClass(status: string): string {
       return 'bg-slate-500/10 text-slate-400 border-slate-500/30';
   }
 }
+

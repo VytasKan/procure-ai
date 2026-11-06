@@ -88,3 +88,4 @@ export interface GuardrailSettings {
   preferredCurrencies: string[];
   restrictedVendors: string[];
 }
+

@@ -20,3 +20,4 @@ export function hasPayPalCredentials(): boolean {
 export function hasAiCredentials(): boolean {
   return Boolean(ENV.GOOGLE_GENERATIVE_AI_API_KEY || ENV.OPENAI_API_KEY);
 }
+

@@ -228,3 +228,4 @@ export class CatalogService {
     return [...PRODUCT_CATALOG];
   }
 }
+
