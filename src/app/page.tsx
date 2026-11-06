@@ -1,100 +1,118 @@
-import Image from "next/image";
+'use client';
+
+import React, { useState, useEffect, useCallback } from 'react';
+import { Header } from '@/frontend/components/Header';
+import { MetricsBar } from '@/frontend/components/MetricsBar';
+import { AgentChat } from '@/frontend/components/AgentChat';
+import { LedgerGrid } from '@/frontend/components/LedgerGrid';
+import { LedgerTransaction } from '@/backend/types';
+import { Cpu, CheckCircle2 } from 'lucide-react';
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const [transactions, setTransactions] = useState<LedgerTransaction[]>([]);
+  const [metrics, setMetrics] = useState({
+    totalSpend: 0,
+    totalOrders: 0,
+    completedOrders: 0,
+    pendingOrders: 0,
+    b2bSavingsEstimated: 0
+  });
+  const [isLoadingLedger, setIsLoadingLedger] = useState(false);
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+  const fetchLedger = useCallback(async () => {
+    setIsLoadingLedger(true);
+    try {
+      const res = await fetch('/api/ledger');
+      if (res.ok) {
+        const data = await res.json();
+        setTransactions(data.transactions || []);
+        setMetrics(data.metrics || {
+          totalSpend: 0,
+          totalOrders: 0,
+          completedOrders: 0,
+          pendingOrders: 0,
+          b2bSavingsEstimated: 0
+        });
+      }
+    } catch (err) {
+      console.error('Failed to load ledger data:', err);
+    } finally {
+      setIsLoadingLedger(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchLedger();
+  }, [fetchLedger]);
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+      <Header />
+
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        {/* Top Spend & Activity KPIs */}
+        <MetricsBar metrics={metrics} />
+
+        {/* Core Workspace: Agent Console & Live Ledger */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          {/* Left Column: Conversational Purchasing Agent */}
+          <div className="lg:col-span-5">
+            <AgentChat onOrderExecuted={fetchLedger} />
+          </div>
+
+          {/* Right Column: AG Grid Ledger & Technical Transparency */}
+          <div className="lg:col-span-7 space-y-6">
+            <LedgerGrid
+              transactions={transactions}
+              isLoading={isLoadingLedger}
+              onRefresh={fetchLedger}
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+
+            {/* Technical Integration Highlights */}
+            <div className="bg-slate-900/40 border border-slate-800/80 rounded-xl p-4">
+              <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
+                <Cpu className="w-4 h-4 text-sky-400" />
+                <span>Architecture & Hackathon Track Alignment</span>
+              </h4>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                <div className="p-3 rounded-lg bg-slate-900/80 border border-slate-800">
+                  <div className="font-semibold text-blue-400 flex items-center justify-between">
+                    <span>PayPal AI Toolkit</span>
+                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-400" />
+                  </div>
+                  <p className="text-slate-400 text-[11px] mt-1">
+                    Uses `@paypal/agent-toolkit` actions: `create_order`, `create_invoice`, and `get_shipment_tracking`.
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-lg bg-slate-900/80 border border-slate-800">
+                  <div className="font-semibold text-emerald-400 flex items-center justify-between">
+                    <span>AG Grid Integration</span>
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                  </div>
+                  <p className="text-slate-400 text-[11px] mt-1">
+                    Powers the enterprise audit ledger with real-time status binding, sort, filter, and theme customization.
+                  </p>
+                </div>
+
+                <div className="p-3 rounded-lg bg-slate-900/80 border border-slate-800">
+                  <div className="font-semibold text-purple-400 flex items-center justify-between">
+                    <span>Channel3 MCP Catalog</span>
+                    <CheckCircle2 className="w-3.5 h-3.5 text-purple-400" />
+                  </div>
+                  <p className="text-slate-400 text-[11px] mt-1">
+                    Discovers inventory across 100M+ real retailer SKUs to optimize bundles and calculate B2B volume discounts.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      {/* Footer */}
+      <footer className="border-t border-slate-800/80 py-4 mt-8 bg-slate-950/60 text-center text-xs text-slate-500">
+        <p>Built for the <strong>Build What&apos;s Next with PayPal and AI</strong> Global Hackathon</p>
       </footer>
     </div>
   );
