@@ -143,8 +143,8 @@ export const AgentChat: React.FC<AgentChatProps> = ({
           if (line.startsWith('• ') || line.startsWith('* ')) {
             const text = line.substring(2);
             return (
-              <div key={idx} className="flex items-start gap-1.5 pl-1 text-slate-200">
-                <span className="text-sky-400 font-bold shrink-0">•</span>
+              <div key={idx} className="flex items-start gap-1.5 pl-1 text-slate-700">
+                <span className="text-[#0070ba] font-bold shrink-0">•</span>
                 <span>{renderInlineBold(text)}</span>
               </div>
             );
@@ -160,10 +160,10 @@ export const AgentChat: React.FC<AgentChatProps> = ({
     const parts = text.split(/(\*\*.*?\*\*|`.*?`)/g);
     return parts.map((part, i) => {
       if (part.startsWith('**') && part.endsWith('**')) {
-        return <strong key={i} className="font-semibold text-white">{part.slice(2, -2)}</strong>;
+        return <strong key={i} className="font-semibold text-slate-900">{part.slice(2, -2)}</strong>;
       }
       if (part.startsWith('`') && part.endsWith('`')) {
-        return <code key={i} className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-slate-950 border border-slate-700/80 text-sky-300">{part.slice(1, -1)}</code>;
+        return <code key={i} className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-slate-100 border border-slate-200 text-[#0070ba]">{part.slice(1, -1)}</code>;
       }
       return part;
     });
@@ -174,63 +174,56 @@ export const AgentChat: React.FC<AgentChatProps> = ({
   };
 
   return (
-    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl flex flex-col h-[580px] shadow-2xl backdrop-blur-sm overflow-hidden">
-      {/* Chat Header */}
-      <div className="p-4 border-b border-slate-800 bg-slate-950/70 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-600 to-sky-400 p-[1.5px] shadow-md shadow-blue-500/20">
-            <div className="w-full h-full bg-slate-950 rounded-[10px] flex items-center justify-center">
-              <Bot className="w-4 h-4 text-sky-400" />
-            </div>
-          </div>
-          <div>
-            <h3 className="text-sm font-bold text-white tracking-tight">Autonomous Procurement Agent</h3>
-            <p className="text-[11px] text-slate-400">Multi-Agent Commerce Engine with Human-in-the-Loop Safety</p>
-          </div>
+    <div className="flex flex-col h-full bg-white overflow-hidden">
+      {/* Secondary Status Sub-header */}
+      <div className="px-3.5 py-2 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between text-[11px]">
+        <div className="flex items-center gap-1.5 text-slate-500">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 inline-block" />
+          <span>Active Context: Acme Tech Labs</span>
         </div>
 
-        <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-slate-800/80 text-slate-300 border border-slate-700/80 shadow-sm">
-          Guardrail: Max ${currentThreshold} auto-approve
+        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white text-slate-700 border border-slate-200 shadow-2xs">
+          Cap: ${currentThreshold} auto-approve
         </span>
       </div>
 
       {/* Message Feed */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-3.5 space-y-3.5 bg-slate-50/40">
         {messages.map(msg => (
           <div
             key={msg.id}
-            className={`flex gap-3 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+            className={`flex gap-2.5 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
           >
             {msg.role === 'assistant' && (
-              <div className="w-7 h-7 rounded-lg bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-sky-400 shrink-0 mt-0.5">
+              <div className="w-7 h-7 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0070ba] shrink-0 mt-0.5">
                 <Bot className="w-3.5 h-3.5" />
               </div>
             )}
 
-            <div className={`max-w-[88%] ${
+            <div className={`max-w-[90%] ${
               msg.role === 'user' 
-                ? 'bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-2xl rounded-tr-sm px-4 py-2.5 text-xs shadow-md shadow-blue-600/20' 
-                : 'bg-slate-950/80 text-slate-200 rounded-2xl rounded-tl-sm p-4 text-xs border border-slate-800 shadow-md'
+                ? 'bg-[#0070ba] text-white rounded-2xl rounded-tr-sm px-3.5 py-2 text-xs shadow-xs' 
+                : 'bg-white text-slate-800 rounded-2xl rounded-tl-sm p-3.5 text-xs border border-slate-200 shadow-xs'
             }`}>
               {/* Optional Expandable Agent Thoughts */}
               {msg.reasoningSteps && msg.reasoningSteps.length > 0 && (
-                <div className="mb-3 rounded-lg border border-slate-800/80 bg-slate-900/60 overflow-hidden">
+                <div className="mb-2.5 rounded-lg border border-slate-200 bg-slate-50 overflow-hidden">
                   <button
                     onClick={() => toggleThoughts(msg.id)}
-                    className="w-full px-3 py-1.5 flex items-center justify-between text-[11px] font-medium text-slate-400 hover:text-slate-200 bg-slate-900/80 transition cursor-pointer"
+                    className="w-full px-2.5 py-1.5 flex items-center justify-between text-[11px] font-medium text-slate-600 hover:text-slate-900 bg-slate-100/70 transition cursor-pointer"
                   >
                     <span className="flex items-center gap-1.5">
-                      <Cpu className="w-3.5 h-3.5 text-sky-400" />
+                      <Cpu className="w-3.5 h-3.5 text-[#0070ba]" />
                       <span>Agent Thought Process ({msg.reasoningSteps.length} steps)</span>
                     </span>
                     {expandedThoughts[msg.id] ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
                   </button>
 
                   {expandedThoughts[msg.id] && (
-                    <div className="p-3 space-y-1.5 text-[11px] font-mono text-slate-300 border-t border-slate-800/60 bg-slate-950/40">
+                    <div className="p-2.5 space-y-1.5 text-[11px] font-mono text-slate-700 border-t border-slate-200 bg-white">
                       {msg.reasoningSteps.map((step, idx) => (
                         <div key={idx} className="flex items-start gap-2">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
                           <span className="leading-snug">{step}</span>
                         </div>
                       ))}
@@ -253,7 +246,7 @@ export const AgentChat: React.FC<AgentChatProps> = ({
             </div>
 
             {msg.role === 'user' && (
-              <div className="w-7 h-7 rounded-lg bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-300 shrink-0 mt-0.5">
+              <div className="w-7 h-7 rounded-lg bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 shrink-0 mt-0.5">
                 <User className="w-3.5 h-3.5" />
               </div>
             )}
@@ -261,13 +254,13 @@ export const AgentChat: React.FC<AgentChatProps> = ({
         ))}
 
         {isLoading && (
-          <div className="flex gap-3 justify-start">
-            <div className="w-7 h-7 rounded-lg bg-blue-600/10 border border-blue-500/20 flex items-center justify-center text-sky-400 shrink-0 mt-0.5">
+          <div className="flex gap-2.5 justify-start">
+            <div className="w-7 h-7 rounded-lg bg-blue-50 border border-blue-100 flex items-center justify-center text-[#0070ba] shrink-0 mt-0.5">
               <Bot className="w-3.5 h-3.5" />
             </div>
-            <div className="bg-slate-950/80 text-slate-300 rounded-2xl rounded-tl-sm px-4 py-3 text-xs border border-slate-800 flex items-center gap-2.5 shadow-md">
-              <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
-              <span className="text-slate-300">Searching Channel3 MCP catalog & compiling PayPal quote...</span>
+            <div className="bg-white text-slate-700 rounded-2xl rounded-tl-sm px-3.5 py-2.5 text-xs border border-slate-200 flex items-center gap-2.5 shadow-xs">
+              <Loader2 className="w-4 h-4 animate-spin text-[#0070ba]" />
+              <span>Searching Channel3 MCP catalog & compiling PayPal quote...</span>
             </div>
           </div>
         )}
@@ -276,14 +269,14 @@ export const AgentChat: React.FC<AgentChatProps> = ({
       </div>
 
       {/* Suggested Prompts Toolbar */}
-      <div className="px-4 py-2 border-t border-slate-800/80 bg-slate-950/50 flex items-center gap-2 overflow-x-auto no-scrollbar">
-        <Sparkles className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-        <span className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold shrink-0">Prompts:</span>
+      <div className="px-3 py-2 border-t border-slate-200 bg-white flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+        <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+        <span className="text-[10px] text-slate-500 uppercase tracking-wider font-semibold shrink-0">Prompts:</span>
         {PRESET_PROMPTS.map((p, idx) => (
           <button
             key={idx}
             onClick={() => handleSend(p)}
-            className="text-[11px] whitespace-nowrap px-3 py-1 rounded-full bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/80 transition cursor-pointer shrink-0 shadow-sm"
+            className="text-[11px] whitespace-nowrap px-2.5 py-1 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 hover:text-slate-900 border border-slate-200 transition cursor-pointer shrink-0"
           >
             {p}
           </button>
@@ -291,7 +284,7 @@ export const AgentChat: React.FC<AgentChatProps> = ({
       </div>
 
       {/* Input Box */}
-      <div className="p-3 border-t border-slate-800 bg-slate-950/80">
+      <div className="p-3 border-t border-slate-200 bg-white">
         <form
           onSubmit={e => {
             e.preventDefault();
@@ -303,13 +296,13 @@ export const AgentChat: React.FC<AgentChatProps> = ({
             type="text"
             value={input}
             onChange={e => setInput(e.target.value)}
-            placeholder="Type procurement request (e.g. 'Equip 3 engineers with dual 4K monitors')..."
-            className="flex-1 bg-slate-900/90 border border-slate-700/80 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
+            placeholder="Type procurement request (e.g. 'Equip 3 engineers')..."
+            className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition"
           />
           <button
             type="submit"
             disabled={!input.trim() || isLoading}
-            className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold flex items-center gap-1.5 disabled:opacity-50 transition cursor-pointer shadow-md shadow-blue-500/20"
+            className="px-3.5 py-2 rounded-xl bg-[#0070ba] hover:bg-[#003087] text-white text-xs font-semibold flex items-center gap-1.5 disabled:opacity-50 transition cursor-pointer shadow-xs"
           >
             <span>Run Agent</span>
             <Send className="w-3.5 h-3.5" />

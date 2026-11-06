@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Search, ShoppingBag, Star, ArrowRight, ShieldCheck, Tag, ExternalLink } from 'lucide-react';
+import { Search, ArrowRight } from 'lucide-react';
 import { ProductItem } from '@/backend/types';
 import { formatCurrency } from '../utils/formatters';
 
@@ -168,17 +168,17 @@ export const CatalogView: React.FC<CatalogViewProps> = ({ onOrderProduct }) => {
   return (
     <div className="space-y-5">
       {/* View Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900/60 p-5 rounded-2xl border border-slate-800 backdrop-blur-sm shadow-xl">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
         <div>
           <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold text-white tracking-tight">
+            <h2 className="text-lg font-bold text-slate-900 tracking-tight">
               Channel3 Multi-Merchant Catalog Intelligence
             </h2>
-            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/30">
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-purple-50 text-purple-700 border border-purple-200">
               100M+ SKUs Simulated
             </span>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-slate-500 mt-1">
             Normalized product feeds across certified enterprise suppliers with real-time stock, warranty, and lead-time analytics.
           </p>
         </div>
@@ -191,19 +191,19 @@ export const CatalogView: React.FC<CatalogViewProps> = ({ onOrderProduct }) => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search products or SKUs..."
-              className="w-full bg-slate-950/80 border border-slate-800 rounded-xl pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-purple-500 transition"
+              className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:bg-white focus:border-purple-500 transition"
             />
           </div>
 
-          <div className="flex items-center gap-1 bg-slate-950/80 p-1 rounded-xl border border-slate-800 text-[11px]">
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200 text-[11px]">
             {['ALL', 'hardware', 'furniture', 'peripherals'].map(cat => (
               <button
                 key={cat}
                 onClick={() => setSelectedCat(cat)}
                 className={`px-3 py-1 rounded-lg font-medium transition cursor-pointer ${
                   selectedCat === cat 
-                    ? 'bg-purple-600 text-white shadow-sm' 
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-purple-600 text-white shadow-xs font-semibold' 
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 {cat === 'ALL' ? 'All' : cat.charAt(0).toUpperCase() + cat.slice(1)}
@@ -218,40 +218,40 @@ export const CatalogView: React.FC<CatalogViewProps> = ({ onOrderProduct }) => {
         {filtered.map(item => (
           <div
             key={item.id}
-            className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-slate-700 transition flex flex-col justify-between shadow-lg backdrop-blur-sm"
+            className="p-5 rounded-2xl bg-white border border-slate-200 hover:border-slate-300 hover:shadow-xs transition flex flex-col justify-between shadow-2xs"
           >
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="font-mono text-[10px] bg-slate-950 text-slate-400 px-2 py-0.5 rounded border border-slate-800">
+                <span className="font-mono text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded border border-slate-200 font-medium">
                   {item.sku}
                 </span>
-                <span className="text-xs font-semibold text-purple-400 flex items-center gap-1">
+                <span className="text-xs font-semibold text-purple-700 flex items-center gap-1">
                   <span>{item.retailer}</span>
                 </span>
               </div>
 
-              <h4 className="text-sm font-bold text-white mb-2 leading-snug">{item.title}</h4>
+              <h4 className="text-sm font-bold text-slate-900 mb-2 leading-snug">{item.title}</h4>
 
               {/* Specs Pills */}
-              <div className="bg-slate-950/70 p-3 rounded-xl border border-slate-850 space-y-1 text-[11px] text-slate-300 mb-4">
+              <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-1 text-[11px] text-slate-600 mb-4">
                 {Object.entries(item.specs).map(([k, v]) => (
                   <div key={k} className="flex justify-between">
                     <span className="text-slate-500 capitalize">{k}:</span>
-                    <span className="font-medium text-slate-200">{v}</span>
+                    <span className="font-medium text-slate-800">{v}</span>
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="pt-3 border-t border-slate-800 flex items-center justify-between">
+            <div className="pt-3 border-t border-slate-100 flex items-center justify-between">
               <div>
-                <span className="text-base font-black text-white font-mono">{formatCurrency(item.price)}</span>
-                <p className="text-[10px] text-emerald-400 font-medium">In Stock • Ships in {item.leadTimeDays}d</p>
+                <span className="text-base font-black text-slate-900 font-mono">{formatCurrency(item.price)}</span>
+                <p className="text-[10px] text-emerald-700 font-medium">In Stock • Ships in {item.leadTimeDays}d</p>
               </div>
 
               <button
                 onClick={() => onOrderProduct(`Procure 2x ${item.title}`)}
-                className="px-4 py-2 rounded-xl bg-purple-600/10 hover:bg-purple-600/20 text-purple-300 hover:text-white border border-purple-500/30 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-sm"
+                className="px-4 py-2 rounded-xl bg-purple-50 hover:bg-purple-100 text-purple-700 border border-purple-200 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-2xs"
               >
                 <span>Procure via Copilot</span>
                 <ArrowRight className="w-3.5 h-3.5" />

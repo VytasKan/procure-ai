@@ -12,7 +12,7 @@ import { PayPalHubView } from '@/frontend/components/PayPalHubView';
 import { SandboxDiagnosticsModal } from '@/frontend/components/SandboxDiagnosticsModal';
 import { CatalogBrowserModal } from '@/frontend/components/CatalogBrowserModal';
 import { PolicyGuardrailModal } from '@/frontend/components/PolicyGuardrailModal';
-import { ToastProvider, useToast } from '@/frontend/components/Toast';
+import { ToastProvider } from '@/frontend/components/Toast';
 import { LedgerTransaction } from '@/backend/types';
 import { Cpu, CheckCircle2 } from 'lucide-react';
 
@@ -66,7 +66,7 @@ function DashboardContent() {
   };
 
   return (
-    <div className="h-screen bg-slate-950 text-slate-100 flex flex-col overflow-hidden selection:bg-blue-600 selection:text-white">
+    <div className="h-screen bg-slate-50 text-slate-900 flex flex-col overflow-hidden selection:bg-blue-600 selection:text-white">
       {/* Top Header */}
       <Header
         onOpenDiagnostics={() => setIsDiagnosticsOpen(true)}
@@ -89,7 +89,7 @@ function DashboardContent() {
         />
 
         {/* Center Main Workspace */}
-        <main className="flex-1 overflow-y-auto p-6 bg-slate-950">
+        <main className="flex-1 overflow-y-auto p-6 bg-slate-50">
           <div className="max-w-6xl mx-auto space-y-6">
             {/* View 1: Settlement Ledger (Centered, Full Width) */}
             {activeTab === 'ledger' && (
@@ -104,42 +104,42 @@ function DashboardContent() {
                 />
 
                 {/* Architecture Highlights Panel */}
-                <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-5 shadow-lg backdrop-blur-sm">
+                <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
                   <div className="flex items-center justify-between mb-3">
-                    <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
-                      <Cpu className="w-3.5 h-3.5 text-sky-400" />
+                    <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                      <Cpu className="w-3.5 h-3.5 text-blue-600" />
                       <span>Hackathon Sponsor Integrations & Architecture</span>
                     </h4>
-                    <span className="text-[10px] text-slate-500 font-medium">All systems active</span>
+                    <span className="text-[10px] text-slate-400 font-medium">All systems active</span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                    <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/90">
-                      <div className="font-bold text-sky-400 flex items-center justify-between text-xs">
+                    <div className="p-3.5 rounded-xl bg-slate-50/70 border border-slate-200">
+                      <div className="font-bold text-[#0070ba] flex items-center justify-between text-xs">
                         <span>PayPal AI Toolkit</span>
-                        <CheckCircle2 className="w-3.5 h-3.5 text-sky-400" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#0070ba]" />
                       </div>
-                      <p className="text-slate-400 text-[11px] mt-1.5 leading-relaxed">
-                        Uses official <code className="text-sky-300 bg-slate-900 px-1 py-0.5 rounded font-mono">@paypal/agent-toolkit</code> for autonomous <code className="text-slate-300">create_order</code> & <code className="text-slate-300">create_invoice</code> execution.
+                      <p className="text-slate-600 text-[11px] mt-1.5 leading-relaxed">
+                        Uses official <code className="text-[#0070ba] bg-blue-50 px-1 py-0.5 rounded font-mono">@paypal/agent-toolkit</code> for autonomous <code className="text-slate-800">create_order</code> & <code className="text-slate-800">create_invoice</code> execution.
                       </p>
                     </div>
 
-                    <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/90">
-                      <div className="font-bold text-emerald-400 flex items-center justify-between text-xs">
+                    <div className="p-3.5 rounded-xl bg-slate-50/70 border border-slate-200">
+                      <div className="font-bold text-emerald-700 flex items-center justify-between text-xs">
                         <span>AG Grid Ledger</span>
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                       </div>
-                      <p className="text-slate-400 text-[11px] mt-1.5 leading-relaxed">
-                        Enterprise data grid with Quartz Dark theme, status cell renderers, and live row selection for order manifests.
+                      <p className="text-slate-600 text-[11px] mt-1.5 leading-relaxed">
+                        Enterprise data grid with Quartz light theme, status cell renderers, and live row selection for order manifests.
                       </p>
                     </div>
 
-                    <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/90">
-                      <div className="font-bold text-indigo-400 flex items-center justify-between text-xs">
+                    <div className="p-3.5 rounded-xl bg-slate-50/70 border border-slate-200">
+                      <div className="font-bold text-purple-700 flex items-center justify-between text-xs">
                         <span>Channel3 MCP Catalog</span>
-                        <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-purple-600" />
                       </div>
-                      <p className="text-slate-400 text-[11px] mt-1.5 leading-relaxed">
+                      <p className="text-slate-600 text-[11px] mt-1.5 leading-relaxed">
                         Searches 100M+ real retailer SKUs across authorized suppliers with B2B volume pricing and delivery schedules.
                       </p>
                     </div>

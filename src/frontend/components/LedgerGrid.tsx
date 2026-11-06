@@ -49,7 +49,7 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
       headerName: 'PO #',
       width: 135,
       cellRenderer: (params: ICellRendererParams<LedgerTransaction>) => (
-        <span className="font-mono text-xs font-bold text-sky-400 hover:text-sky-300 transition cursor-pointer flex items-center gap-1">
+        <span className="font-mono text-xs font-bold text-blue-600 hover:text-blue-800 transition cursor-pointer flex items-center gap-1">
           {params.value}
         </span>
       )
@@ -68,9 +68,9 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
       minWidth: 220,
       cellRenderer: (params: ICellRendererParams<LedgerTransaction>) => (
         <div className="py-1">
-          <div className="font-medium text-slate-100 truncate text-xs">{params.data?.title}</div>
-          <div className="text-[10px] text-slate-400 flex items-center gap-1.5 mt-0.5">
-            <span className="text-slate-300">{params.data?.department}</span>
+          <div className="font-semibold text-slate-900 truncate text-xs">{params.data?.title}</div>
+          <div className="text-[10px] text-slate-500 flex items-center gap-1.5 mt-0.5">
+            <span className="text-slate-700 font-medium">{params.data?.department}</span>
             <span>•</span>
             <span>Req: {params.data?.requestedBy}</span>
           </div>
@@ -82,7 +82,7 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
       headerName: 'Supplier / Retailer',
       width: 160,
       cellRenderer: (params: ICellRendererParams<LedgerTransaction>) => (
-        <span className="text-xs text-slate-300 font-medium truncate block">
+        <span className="text-xs text-slate-700 font-medium truncate block">
           {params.value}
         </span>
       )
@@ -92,7 +92,7 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
       headerName: 'Amount',
       width: 125,
       cellRenderer: (params: ICellRendererParams<LedgerTransaction>) => (
-        <span className="font-mono font-bold text-xs text-slate-100">
+        <span className="font-mono font-bold text-xs text-slate-900">
           {formatCurrency(params.value || 0, params.data?.currency)}
         </span>
       )
@@ -106,14 +106,14 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
         const url = params.data?.paypalPaymentUrl;
         return (
           <div className="flex items-center gap-1.5 font-mono text-[11px]">
-            <span className="text-slate-300 truncate max-w-[130px]">{refId}</span>
+            <span className="text-slate-700 truncate max-w-[130px]">{refId}</span>
             {url && (
               <a
                 href={url}
                 target="_blank"
                 rel="noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="text-blue-400 hover:text-blue-300 transition p-1 hover:bg-blue-500/10 rounded"
+                className="text-blue-600 hover:text-blue-800 transition p-1 hover:bg-blue-50 rounded"
                 title="Inspect in PayPal Sandbox"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
@@ -175,19 +175,19 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
 
   return (
     <>
-      <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 shadow-2xl backdrop-blur-sm">
+      <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs">
         {/* Header & Controls */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-bold text-white tracking-tight">
+              <h2 className="text-base font-bold text-slate-900 tracking-tight">
                 Enterprise Settlement Ledger
               </h2>
-              <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+              <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-blue-50 text-blue-700 border border-blue-200">
                 AG Grid Powered
               </span>
             </div>
-            <p className="text-xs text-slate-400 mt-0.5">
+            <p className="text-xs text-slate-500 mt-0.5">
               Audited transaction stream with live PayPal Sandbox settlement verification
             </p>
           </div>
@@ -195,7 +195,7 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
           <div className="flex items-center gap-2">
             <button
               onClick={handleExportCSV}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-xs font-medium text-slate-300 border border-slate-700/80 transition cursor-pointer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-xs font-medium text-slate-700 border border-slate-200 transition cursor-pointer"
               title="Export CSV"
             >
               <Download className="w-3.5 h-3.5" />
@@ -206,7 +206,7 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
               <button
                 onClick={onRefresh}
                 disabled={isLoading}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600/10 hover:bg-blue-600/20 text-xs font-semibold text-blue-400 border border-blue-500/30 transition cursor-pointer"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 hover:bg-blue-100 text-xs font-semibold text-blue-700 border border-blue-200 transition cursor-pointer"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
                 <span>Sync</span>
@@ -225,20 +225,20 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search PO, vendor, title, or PayPal ID..."
-              className="w-full bg-slate-950/70 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition"
+              className="w-full bg-slate-50 border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-900 placeholder-slate-400 focus:bg-white focus:outline-none focus:border-blue-500 transition"
             />
           </div>
 
           {/* Quick Status Filter Tabs */}
-          <div className="flex items-center gap-1 bg-slate-950/70 p-1 rounded-lg border border-slate-800 text-[11px] w-full sm:w-auto">
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 text-[11px] w-full sm:w-auto">
             {['ALL', 'COMPLETED', 'SHIPPED', 'APPROVED'].map((st) => (
               <button
                 key={st}
                 onClick={() => setStatusFilter(st)}
                 className={`px-2.5 py-1 rounded-md font-medium transition cursor-pointer ${
                   statusFilter === st 
-                    ? 'bg-blue-600 text-white shadow-sm' 
-                    : 'text-slate-400 hover:text-white'
+                    ? 'bg-white text-slate-900 shadow-xs font-semibold' 
+                    : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
                 {st === 'ALL' ? 'All' : st.charAt(0) + st.slice(1).toLowerCase()}
@@ -249,7 +249,7 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
 
         {/* The AG Grid Table */}
         <div 
-          className="ag-theme-quartz ag-theme-quartz-dark w-full rounded-xl overflow-hidden border border-slate-800 shadow-inner"
+          className="ag-theme-quartz w-full rounded-xl overflow-hidden border border-slate-200 shadow-xs"
           style={{ height: '460px', width: '100%' }}
         >
           <AgGridReact<LedgerTransaction>
@@ -266,7 +266,7 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
         </div>
 
         <div className="mt-2 text-right">
-          <span className="text-[10px] text-slate-500">
+          <span className="text-[10px] text-slate-400">
             Tip: Click any transaction row to inspect order manifest & shipment tracking
           </span>
         </div>
