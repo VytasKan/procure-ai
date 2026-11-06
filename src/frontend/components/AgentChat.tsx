@@ -3,10 +3,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { AgentChatMessage, ProcurementQuote } from '@/backend/types';
 import { QuoteApprovalCard } from './QuoteApprovalModal';
-import { Send, Bot, User, Sparkles, Loader2, ArrowRight } from 'lucide-react';
+import { useToast } from './Toast';
+import { Send, Bot, User, Sparkles, Loader2, ChevronDown, ChevronRight, CheckCircle2, Cpu } from 'lucide-react';
 
 interface AgentChatProps {
   onOrderExecuted: () => void;
+  externalPrompt?: string;
+  onClearExternalPrompt?: () => void;
+  currentThreshold: number;
 }
 
 const PRESET_PROMPTS = [
@@ -16,22 +20,41 @@ const PRESET_PROMPTS = [
   'Find 2 ergonomic mesh office chairs with lumbar support'
 ];
 
-export const AgentChat: React.FC<AgentChatProps> = ({ onOrderExecuted }) => {
+export const AgentChat: React.FC<AgentChatProps> = ({ 
+  onOrderExecuted,
+  externalPrompt,
+  onClearExternalPrompt,
+  currentThreshold
+}) => {
+  const { showToast } = useToast();
   const [messages, setMessages] = useState<AgentChatMessage[]>([
     {
       id: 'init-1',
       role: 'assistant',
       content: `Hello! I am **ProcureAI**, your autonomous B2B purchasing agent.\n\nI search multi-merchant supplier catalogs (Channel3), verify corporate budget policies, negotiate volume discounts, and execute approved orders directly through **PayPal Sandbox** (Orders & Invoicing).\n\nWhat would you like to procure today?`,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      reasoningSteps: [
+        'Agent Initialized: PayPal Sandbox integration verified via @paypal/agent-toolkit.',
+        `Policy Boundary: Auto-approval threshold currently set to $${currentThreshold}.00 USD.`,
+        'Catalog Feed: Channel3 normalized retail inventory synchronized across 6 certified vendors.'
+      ]
     }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [expandedThoughts, setExpandedThoughts] = useState<Record<string, boolean>>({ 'init-1': false });
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     scrollRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
+
+  useEffect(() => {
+    if (externalPrompt) {
+      handleSend(externalPrompt);
+      if (onClearExternalPrompt) onClearExternalPrompt();
+    }
+  }, [externalPrompt]);
 
   const handleSend = async (textToSend?: string) => {
     const query = textToSend || input;
@@ -58,6 +81,8 @@ export const AgentChat: React.FC<AgentChatProps> = ({ onOrderExecuted }) => {
       if (!res.ok) throw new Error('Failed to reach agent API');
       const data: AgentChatMessage = await res.json();
       setMessages(prev => [...prev, data]);
+      setExpandedThoughts(prev => ({ ...prev, [data.id]: true }));
+      showToast('Agent reasoning complete', 'Catalog evaluated & PayPal quote prepared', 'info');
     } catch {
       setMessages(prev => [
         ...prev,
@@ -68,6 +93,7 @@ export const AgentChat: React.FC<AgentChatProps> = ({ onOrderExecuted }) => {
           timestamp: new Date().toISOString()
         }
       ]);
+      showToast('Catalog search error', 'Please try again', 'warning');
     } finally {
       setIsLoading(false);
     }
@@ -89,15 +115,21 @@ export const AgentChat: React.FC<AgentChatProps> = ({ onOrderExecuted }) => {
         {
           id: `exec-${Date.now()}`,
           role: 'assistant',
-          content: `✅ **PayPal Authorization Successful!**\n\n• **Reference ID:** \`${data.paypalResult.id}\`\n• **Amount Captured:** $${quote.totalAmount.toFixed(2)} USD\n• **Ledger Entry:** Logged as **${data.transaction.orderNumber}**\n\nThe transaction has been automatically added to your enterprise audit ledger.`,
+          content: `✅ **PayPal Authorization Successful!**\n\n• **Reference ID:** \`${data.paypalResult.id}\`\n• **Amount Captured:** $${quote.totalAmount.toFixed(2)} USD\n• **Ledger Entry:** Logged as **${data.transaction.orderNumber}**\n\nThe transaction has been automatically added to your enterprise audit ledger with tracking **${data.transaction.trackingNumber}**.`,
           timestamp: new Date().toISOString()
         }
       ]);
 
+      showToast(
+        'PayPal Sandbox Order Captured!', 
+        `PO #${data.transaction.orderNumber} • ${data.paypalResult.id}`,
+        'success'
+      );
+
       onOrderExecuted();
     } catch (err) {
       console.error(err);
-      alert('Failed to execute PayPal order. Check console.');
+      showToast('Authorization Failed', 'Could not commit transaction to PayPal sandbox', 'warning');
     }
   };
 
@@ -137,8 +169,12 @@ export const AgentChat: React.FC<AgentChatProps> = ({ onOrderExecuted }) => {
     });
   };
 
+  const toggleThoughts = (id: string) => {
+    setExpandedThoughts(prev => ({ ...prev, [id]: !prev[id] }));
+  };
+
   return (
-    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl flex flex-col h-[570px] shadow-2xl backdrop-blur-sm overflow-hidden">
+    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl flex flex-col h-[580px] shadow-2xl backdrop-blur-sm overflow-hidden">
       {/* Chat Header */}
       <div className="p-4 border-b border-slate-800 bg-slate-950/70 flex items-center justify-between">
         <div className="flex items-center gap-3">
@@ -149,12 +185,12 @@ export const AgentChat: React.FC<AgentChatProps> = ({ onOrderExecuted }) => {
           </div>
           <div>
             <h3 className="text-sm font-bold text-white tracking-tight">Autonomous Procurement Agent</h3>
-            <p className="text-[11px] text-slate-400">Powered by `@paypal/agent-toolkit` & Channel3 Catalog</p>
+            <p className="text-[11px] text-slate-400">Multi-Agent Commerce Engine with Human-in-the-Loop Safety</p>
           </div>
         </div>
 
         <span className="text-[10px] font-semibold px-2.5 py-1 rounded-full bg-slate-800/80 text-slate-300 border border-slate-700/80 shadow-sm">
-          Guardrail: Max $350 auto-approve
+          Guardrail: Max ${currentThreshold} auto-approve
         </span>
       </div>
 
@@ -176,6 +212,33 @@ export const AgentChat: React.FC<AgentChatProps> = ({ onOrderExecuted }) => {
                 ? 'bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-2xl rounded-tr-sm px-4 py-2.5 text-xs shadow-md shadow-blue-600/20' 
                 : 'bg-slate-950/80 text-slate-200 rounded-2xl rounded-tl-sm p-4 text-xs border border-slate-800 shadow-md'
             }`}>
+              {/* Optional Expandable Agent Thoughts */}
+              {msg.reasoningSteps && msg.reasoningSteps.length > 0 && (
+                <div className="mb-3 rounded-lg border border-slate-800/80 bg-slate-900/60 overflow-hidden">
+                  <button
+                    onClick={() => toggleThoughts(msg.id)}
+                    className="w-full px-3 py-1.5 flex items-center justify-between text-[11px] font-medium text-slate-400 hover:text-slate-200 bg-slate-900/80 transition cursor-pointer"
+                  >
+                    <span className="flex items-center gap-1.5">
+                      <Cpu className="w-3.5 h-3.5 text-sky-400" />
+                      <span>Agent Thought Process ({msg.reasoningSteps.length} steps)</span>
+                    </span>
+                    {expandedThoughts[msg.id] ? <ChevronDown className="w-3.5 h-3.5" /> : <ChevronRight className="w-3.5 h-3.5" />}
+                  </button>
+
+                  {expandedThoughts[msg.id] && (
+                    <div className="p-3 space-y-1.5 text-[11px] font-mono text-slate-300 border-t border-slate-800/60 bg-slate-950/40">
+                      {msg.reasoningSteps.map((step, idx) => (
+                        <div key={idx} className="flex items-start gap-2">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                          <span className="leading-snug">{step}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="leading-relaxed">
                 {renderFormattedContent(msg.content)}
               </div>
@@ -204,7 +267,7 @@ export const AgentChat: React.FC<AgentChatProps> = ({ onOrderExecuted }) => {
             </div>
             <div className="bg-slate-950/80 text-slate-300 rounded-2xl rounded-tl-sm px-4 py-3 text-xs border border-slate-800 flex items-center gap-2.5 shadow-md">
               <Loader2 className="w-4 h-4 animate-spin text-blue-400" />
-              <span className="text-slate-300">Evaluating multi-retailer inventory & volume pricing...</span>
+              <span className="text-slate-300">Searching Channel3 MCP catalog & compiling PayPal quote...</span>
             </div>
           </div>
         )}

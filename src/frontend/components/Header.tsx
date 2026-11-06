@@ -1,9 +1,21 @@
 'use client';
 
 import React from 'react';
-import { Bot, Sparkles, Building2, ShieldCheck, Zap } from 'lucide-react';
+import { Bot, Sparkles, ShoppingBag, ShieldAlert } from 'lucide-react';
 
-export const Header: React.FC = () => {
+interface HeaderProps {
+  onOpenDiagnostics: () => void;
+  onOpenCatalog: () => void;
+  onOpenPolicy: () => void;
+  currentThreshold: number;
+}
+
+export const Header: React.FC<HeaderProps> = ({
+  onOpenDiagnostics,
+  onOpenCatalog,
+  onOpenPolicy,
+  currentThreshold
+}) => {
   return (
     <header className="border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-xl sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
@@ -23,28 +35,44 @@ export const Header: React.FC = () => {
                 Agentic B2B
               </span>
             </div>
-            <p className="text-[11px] text-slate-400 font-medium">Autonomous Commercial Procurement & PayPal Settlement</p>
+            <p className="text-[11px] text-slate-400 font-medium hidden sm:block">
+              Autonomous Commercial Procurement & PayPal Settlement
+            </p>
           </div>
         </div>
 
-        {/* Live Badges & System State */}
-        <div className="flex items-center space-x-2.5">
-          <div className="hidden sm:flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-xs shadow-inner">
-            <Building2 className="w-3.5 h-3.5 text-slate-400" />
-            <span className="text-slate-200 font-semibold">Acme Tech Labs</span>
-            <span className="text-slate-600">|</span>
-            <span className="text-emerald-400 font-mono text-[11px] font-semibold">Auto-Limit: $350.00</span>
-          </div>
+        {/* Action Controls & Live State */}
+        <div className="flex items-center space-x-2">
+          {/* Policy Guardrails Button */}
+          <button
+            onClick={onOpenPolicy}
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-800 text-xs text-slate-300 transition cursor-pointer shadow-sm"
+            title="Configure spending guardrails"
+          >
+            <ShieldAlert className="w-3.5 h-3.5 text-amber-400" />
+            <span className="hidden md:inline font-medium">Policy:</span>
+            <span className="text-emerald-400 font-mono font-bold">${currentThreshold}</span>
+          </button>
 
-          <div className="flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-xs shadow-sm">
-            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span className="text-emerald-300 font-semibold text-[11px]">PayPal Sandbox Active</span>
-          </div>
+          {/* Catalog Browser Button */}
+          <button
+            onClick={onOpenCatalog}
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-purple-600/10 hover:bg-purple-600/20 border border-purple-500/30 text-xs font-semibold text-purple-300 transition cursor-pointer shadow-sm"
+            title="Inspect Channel3 multi-merchant catalog"
+          >
+            <ShoppingBag className="w-3.5 h-3.5 text-purple-400" />
+            <span className="hidden sm:inline">Channel3 Catalog</span>
+          </button>
 
-          <div className="hidden md:flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-[11px] font-semibold text-indigo-300">
-            <Sparkles className="w-3 h-3 text-indigo-400" />
-            <span>@paypal/agent-toolkit</span>
-          </div>
+          {/* PayPal Diagnostics Button */}
+          <button
+            onClick={onOpenDiagnostics}
+            className="flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 text-xs font-semibold text-emerald-300 transition cursor-pointer shadow-sm"
+            title="View PayPal Sandbox connection details"
+          >
+            <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-sm shadow-emerald-400/50" />
+            <span>PayPal Sandbox</span>
+          </button>
         </div>
       </div>
     </header>

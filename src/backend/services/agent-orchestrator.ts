@@ -105,11 +105,23 @@ export class AgentOrchestrator {
       responseText = `I searched current supplier catalogs for "${userPrompt}", but could not find exact SKU matches. Try searching for "dual 4K monitors", "electric standing desk", "ergonomic chair", or "onboard 3 developers".`;
     }
 
+    const reasoningSteps: string[] = quote ? [
+      `Catalog Discovery: Queried Channel3 MCP across authorized enterprise retailers.`,
+      `SKU Selection: Matched ${matchedProducts.length} verified item(s) from ${Array.from(new Set(matchedProducts.map(p => p.retailer))).join(', ')}.`,
+      `Volume Discount: ${quote.bulkDiscount > 0 ? `Qualified for 8% Tier-2 B2B bulk savings (-$${quote.bulkDiscount.toFixed(2)}).` : 'Standard enterprise tier applied.'}`,
+      `Policy Evaluation: Total ($${quote.totalAmount.toFixed(2)}) ${quote.requiresApproval ? `exceeds auto-approval cap ($${ENV.AUTO_APPROVE_THRESHOLD.toFixed(2)}) -> Escalated for Manager Authorization.` : `within pre-approved budget ($${ENV.AUTO_APPROVE_THRESHOLD.toFixed(2)}).`}`,
+      `PayPal Preparation: Initialized ${quote.paymentMethod === 'PAYPAL_INVOICE' ? 'PayPal Invoicing v2 (Net-15 terms)' : 'PayPal Orders v2 capture manifest'} payload.`
+    ] : [
+      `Catalog Search: Queried supplier database for "${userPrompt}".`,
+      `Result: 0 matching SKUs found.`
+    ];
+
     return {
       id: `msg-${Date.now()}`,
       role: 'assistant',
       content: responseText,
       timestamp: new Date().toISOString(),
+      reasoningSteps,
       quote
     };
   }

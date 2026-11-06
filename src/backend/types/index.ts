@@ -75,6 +75,7 @@ export interface AgentChatMessage {
   role: 'user' | 'assistant' | 'system';
   content: string;
   timestamp: string;
+  reasoningSteps?: string[];
   quote?: ProcurementQuote;
   paypalAction?: {
     type: 'ORDER_CREATED' | 'INVOICE_SENT' | 'TRACKING_UPDATED';

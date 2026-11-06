@@ -5,10 +5,14 @@ import { Header } from '@/frontend/components/Header';
 import { MetricsBar } from '@/frontend/components/MetricsBar';
 import { AgentChat } from '@/frontend/components/AgentChat';
 import { LedgerGrid } from '@/frontend/components/LedgerGrid';
+import { SandboxDiagnosticsModal } from '@/frontend/components/SandboxDiagnosticsModal';
+import { CatalogBrowserModal } from '@/frontend/components/CatalogBrowserModal';
+import { PolicyGuardrailModal } from '@/frontend/components/PolicyGuardrailModal';
+import { ToastProvider, useToast } from '@/frontend/components/Toast';
 import { LedgerTransaction } from '@/backend/types';
 import { Cpu, CheckCircle2 } from 'lucide-react';
 
-export default function Home() {
+function DashboardContent() {
   const [transactions, setTransactions] = useState<LedgerTransaction[]>([]);
   const [metrics, setMetrics] = useState({
     totalSpend: 0,
@@ -18,6 +22,11 @@ export default function Home() {
     b2bSavingsEstimated: 0
   });
   const [isLoadingLedger, setIsLoadingLedger] = useState(false);
+  const [isDiagnosticsOpen, setIsDiagnosticsOpen] = useState(false);
+  const [isCatalogOpen, setIsCatalogOpen] = useState(false);
+  const [isPolicyOpen, setIsPolicyOpen] = useState(false);
+  const [currentThreshold, setCurrentThreshold] = useState(350);
+  const [externalPrompt, setExternalPrompt] = useState<string | undefined>(undefined);
 
   const fetchLedger = useCallback(async () => {
     setIsLoadingLedger(true);
@@ -47,20 +56,31 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-blue-600 selection:text-white">
-      <Header />
+      {/* Header */}
+      <Header
+        onOpenDiagnostics={() => setIsDiagnosticsOpen(true)}
+        onOpenCatalog={() => setIsCatalogOpen(true)}
+        onOpenPolicy={() => setIsPolicyOpen(true)}
+        currentThreshold={currentThreshold}
+      />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Executive Metrics Overview */}
+        {/* Executive Metrics Bar */}
         <MetricsBar metrics={metrics} />
 
-        {/* Core Workspace: Agent Console & Live AG Grid Ledger */}
+        {/* Core Workspace Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left Column: Conversational Purchasing Agent (5 Cols) */}
+          {/* Left Column: Autonomous Purchasing Agent (5 Columns) */}
           <div className="lg:col-span-5">
-            <AgentChat onOrderExecuted={fetchLedger} />
+            <AgentChat
+              onOrderExecuted={fetchLedger}
+              externalPrompt={externalPrompt}
+              onClearExternalPrompt={() => setExternalPrompt(undefined)}
+              currentThreshold={currentThreshold}
+            />
           </div>
 
-          {/* Right Column: AG Grid Ledger & Architecture Panel (7 Cols) */}
+          {/* Right Column: AG Grid Ledger & Technical Highlights (7 Columns) */}
           <div className="lg:col-span-7 space-y-5">
             <LedgerGrid
               transactions={transactions}
@@ -68,7 +88,7 @@ export default function Home() {
               onRefresh={fetchLedger}
             />
 
-            {/* Hackathon Architecture & Track Alignment Panel */}
+            {/* Hackathon Architecture Card */}
             <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-4 shadow-lg backdrop-blur-sm">
               <div className="flex items-center justify-between mb-3">
                 <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
@@ -117,10 +137,37 @@ export default function Home() {
         </div>
       </main>
 
+      {/* Modals & Dialogs */}
+      <SandboxDiagnosticsModal
+        isOpen={isDiagnosticsOpen}
+        onClose={() => setIsDiagnosticsOpen(false)}
+      />
+
+      <CatalogBrowserModal
+        isOpen={isCatalogOpen}
+        onClose={() => setIsCatalogOpen(false)}
+        onSelectProduct={(prompt) => setExternalPrompt(prompt)}
+      />
+
+      <PolicyGuardrailModal
+        isOpen={isPolicyOpen}
+        onClose={() => setIsPolicyOpen(false)}
+        currentThreshold={currentThreshold}
+        onUpdateThreshold={(newT) => setCurrentThreshold(newT)}
+      />
+
       {/* Footer */}
       <footer className="border-t border-slate-800/80 py-4 mt-8 bg-slate-950/80 text-center text-xs text-slate-500">
         <p>Built for the <strong>Build What&apos;s Next with PayPal and AI</strong> Global Hackathon</p>
       </footer>
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <ToastProvider>
+      <DashboardContent />
+    </ToastProvider>
   );
 }

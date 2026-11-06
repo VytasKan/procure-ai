@@ -5,7 +5,7 @@ import { AgGridReact } from 'ag-grid-react';
 import { ModuleRegistry, AllCommunityModule, ColDef, ICellRendererParams, RowClickedEvent } from 'ag-grid-community';
 import { LedgerTransaction } from '@/backend/types';
 import { formatCurrency, formatDate, getStatusBadgeClass } from '../utils/formatters';
-import { ExternalLink, RefreshCw, Search, ShieldCheck, Download } from 'lucide-react';
+import { ExternalLink, RefreshCw, Search, Download } from 'lucide-react';
 import { OrderDetailsModal } from './OrderDetailsModal';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
