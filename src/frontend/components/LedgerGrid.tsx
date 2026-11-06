@@ -4,11 +4,11 @@ import React, { useMemo, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
 import { ModuleRegistry, AllCommunityModule, ColDef, ICellRendererParams, RowClickedEvent } from 'ag-grid-community';
 import { LedgerTransaction } from '@/backend/types';
+import { formatCurrency, formatDate, getStatusBadgeClass } from '../utils/formatters';
+import { ExternalLink, RefreshCw, Search, ShieldCheck, Download } from 'lucide-react';
+import { OrderDetailsModal } from './OrderDetailsModal';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
-import { formatCurrency, formatDate, getStatusBadgeClass } from '../utils/formatters';
-import { ExternalLink, RefreshCw } from 'lucide-react';
-import { OrderDetailsModal } from './OrderDetailsModal';
 
 interface LedgerGridProps {
   transactions: LedgerTransaction[];
@@ -22,23 +22,42 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
   onRefresh
 }) => {
   const [selectedTx, setSelectedTx] = useState<LedgerTransaction | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('ALL');
+
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter(tx => {
+      const matchesSearch = 
+        !searchQuery ||
+        tx.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tx.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tx.supplier.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (tx.paypalOrderId && tx.paypalOrderId.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (tx.paypalInvoiceId && tx.paypalInvoiceId.toLowerCase().includes(searchQuery.toLowerCase()));
+
+      const matchesStatus = 
+        statusFilter === 'ALL' || 
+        tx.status.toUpperCase() === statusFilter.toUpperCase();
+
+      return matchesSearch && matchesStatus;
+    });
+  }, [transactions, searchQuery, statusFilter]);
 
   const columnDefs = useMemo<ColDef<LedgerTransaction>[]>(() => [
     {
       field: 'orderNumber',
       headerName: 'PO #',
-      width: 130,
+      width: 135,
       cellRenderer: (params: ICellRendererParams<LedgerTransaction>) => (
-        <span className="font-mono font-semibold text-sky-400 hover:underline cursor-pointer">
+        <span className="font-mono text-xs font-bold text-sky-400 hover:text-sky-300 transition cursor-pointer flex items-center gap-1">
           {params.value}
         </span>
-      ),
-      filter: true
+      )
     },
     {
       field: 'createdAt',
       headerName: 'Date',
-      width: 120,
+      width: 110,
       valueFormatter: (params) => formatDate(params.value),
       sort: 'desc'
     },
@@ -48,52 +67,54 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
       flex: 2,
       minWidth: 220,
       cellRenderer: (params: ICellRendererParams<LedgerTransaction>) => (
-        <div>
-          <div className="font-medium text-slate-100 truncate">{params.data?.title}</div>
-          <div className="text-[11px] text-slate-400">Req: {params.data?.requestedBy}</div>
+        <div className="py-1">
+          <div className="font-medium text-slate-100 truncate text-xs">{params.data?.title}</div>
+          <div className="text-[10px] text-slate-400 flex items-center gap-1.5 mt-0.5">
+            <span className="text-slate-300">{params.data?.department}</span>
+            <span>•</span>
+            <span>Req: {params.data?.requestedBy}</span>
+          </div>
         </div>
       )
     },
     {
-      field: 'department',
-      headerName: 'Dept',
-      width: 130,
-      filter: true
-    },
-    {
       field: 'supplier',
-      headerName: 'Supplier / Vendor',
+      headerName: 'Supplier / Retailer',
       width: 160,
-      filter: true
+      cellRenderer: (params: ICellRendererParams<LedgerTransaction>) => (
+        <span className="text-xs text-slate-300 font-medium truncate block">
+          {params.value}
+        </span>
+      )
     },
     {
       field: 'totalAmount',
       headerName: 'Amount',
-      width: 130,
+      width: 125,
       cellRenderer: (params: ICellRendererParams<LedgerTransaction>) => (
-        <span className="font-mono font-bold text-slate-100">
+        <span className="font-mono font-bold text-xs text-slate-100">
           {formatCurrency(params.value || 0, params.data?.currency)}
         </span>
       )
     },
     {
       field: 'paypalOrderId',
-      headerName: 'PayPal Reference',
-      width: 200,
+      headerName: 'PayPal Settlement',
+      width: 190,
       cellRenderer: (params: ICellRendererParams<LedgerTransaction>) => {
         const refId = params.data?.paypalOrderId || params.data?.paypalInvoiceId || 'Pending';
         const url = params.data?.paypalPaymentUrl;
         return (
-          <div className="flex items-center gap-1.5 font-mono text-xs">
-            <span className="text-slate-300 truncate">{refId}</span>
+          <div className="flex items-center gap-1.5 font-mono text-[11px]">
+            <span className="text-slate-300 truncate max-w-[130px]">{refId}</span>
             {url && (
               <a
                 href={url}
                 target="_blank"
                 rel="noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="text-blue-400 hover:text-blue-300"
-                title="View in PayPal Sandbox"
+                className="text-blue-400 hover:text-blue-300 transition p-1 hover:bg-blue-500/10 rounded"
+                title="Inspect in PayPal Sandbox"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
@@ -105,11 +126,11 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
     {
       field: 'status',
       headerName: 'Ledger Status',
-      width: 150,
+      width: 135,
       cellRenderer: (params: ICellRendererParams<LedgerTransaction>) => {
         const status = params.value || 'UNKNOWN';
         return (
-          <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-medium border ${getStatusBadgeClass(status)}`}>
+          <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold border ${getStatusBadgeClass(status)}`}>
             {status}
           </span>
         );
@@ -129,50 +150,125 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
     }
   };
 
+  const handleExportCSV = () => {
+    const headers = ['PO Number', 'Date', 'Description', 'Department', 'Supplier', 'Amount', 'Currency', 'PayPal Reference', 'Status'];
+    const rows = filteredTransactions.map(t => [
+      t.orderNumber,
+      formatDate(t.createdAt),
+      `"${t.title.replace(/"/g, '""')}"`,
+      t.department,
+      `"${t.supplier}"`,
+      t.totalAmount,
+      t.currency,
+      t.paypalOrderId || t.paypalInvoiceId || '',
+      t.status
+    ]);
+    const csvContent = 'data:text/csv;charset=utf-8,' + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement('a');
+    link.setAttribute('href', encodedUri);
+    link.setAttribute('download', `procureai-ledger-${new Date().toISOString().split('T')[0]}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <>
-      <div className="bg-slate-900/70 border border-slate-800 rounded-xl p-5 shadow-lg">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 shadow-2xl backdrop-blur-sm">
+        {/* Header & Controls */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
           <div>
-            <h2 className="text-base font-bold text-white flex items-center gap-2">
-              <span>Enterprise Settlement Ledger</span>
-              <span className="text-xs font-normal px-2 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/30">
+            <div className="flex items-center gap-2">
+              <h2 className="text-base font-bold text-white tracking-tight">
+                Enterprise Settlement Ledger
+              </h2>
+              <span className="px-2 py-0.5 text-[10px] font-semibold rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
                 AG Grid Powered
               </span>
-            </h2>
-            <p className="text-xs text-slate-400">
-              Real-time audit log of all autonomous agent purchase authorizations & PayPal transactions (Click any row to inspect details)
+            </div>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Audited transaction stream with live PayPal Sandbox settlement verification
             </p>
           </div>
 
-          {onRefresh && (
+          <div className="flex items-center gap-2">
             <button
-              onClick={onRefresh}
-              disabled={isLoading}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium text-slate-300 border border-slate-700 transition cursor-pointer"
+              onClick={handleExportCSV}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-700 text-xs font-medium text-slate-300 border border-slate-700/80 transition cursor-pointer"
+              title="Export CSV"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
-              <span>Sync Ledger</span>
+              <Download className="w-3.5 h-3.5" />
+              <span>Export</span>
             </button>
-          )}
+
+            {onRefresh && (
+              <button
+                onClick={onRefresh}
+                disabled={isLoading}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-600/10 hover:bg-blue-600/20 text-xs font-semibold text-blue-400 border border-blue-500/30 transition cursor-pointer"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+                <span>Sync</span>
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* Filter Toolbar */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 mb-3">
+          {/* Search Input */}
+          <div className="relative w-full sm:w-72">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search PO, vendor, title, or PayPal ID..."
+              className="w-full bg-slate-950/70 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-blue-500 transition"
+            />
+          </div>
+
+          {/* Quick Status Filter Tabs */}
+          <div className="flex items-center gap-1 bg-slate-950/70 p-1 rounded-lg border border-slate-800 text-[11px] w-full sm:w-auto">
+            {['ALL', 'COMPLETED', 'SHIPPED', 'APPROVED'].map((st) => (
+              <button
+                key={st}
+                onClick={() => setStatusFilter(st)}
+                className={`px-2.5 py-1 rounded-md font-medium transition cursor-pointer ${
+                  statusFilter === st 
+                    ? 'bg-blue-600 text-white shadow-sm' 
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                {st === 'ALL' ? 'All' : st.charAt(0) + st.slice(1).toLowerCase()}
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* The AG Grid Table */}
         <div 
-          className="ag-theme-quartz-dark w-full rounded-lg overflow-hidden border border-slate-800"
-          style={{ height: '380px', width: '100%' }}
+          className="ag-theme-quartz ag-theme-quartz-dark w-full rounded-xl overflow-hidden border border-slate-800 shadow-inner"
+          style={{ height: '390px', width: '100%' }}
         >
           <AgGridReact<LedgerTransaction>
-            rowData={transactions}
+            rowData={filteredTransactions}
             columnDefs={columnDefs}
             defaultColDef={defaultColDef}
             animateRows={true}
             pagination={true}
             paginationPageSize={10}
-            paginationPageSizeSelector={[5, 10, 20]}
+            paginationPageSizeSelector={[5, 10, 25]}
             onRowClicked={handleRowClicked}
             rowSelection={{ mode: 'singleRow' }}
           />
+        </div>
+
+        <div className="mt-2 text-right">
+          <span className="text-[10px] text-slate-500">
+            Tip: Click any transaction row to inspect order manifest & shipment tracking
+          </span>
         </div>
       </div>
 

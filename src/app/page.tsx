@@ -46,62 +46,69 @@ export default function Home() {
   }, [fetchLedger]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-blue-600 selection:text-white">
       <Header />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* Top Spend & Activity KPIs */}
+        {/* Executive Metrics Overview */}
         <MetricsBar metrics={metrics} />
 
-        {/* Core Workspace: Agent Console & Live Ledger */}
+        {/* Core Workspace: Agent Console & Live AG Grid Ledger */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-          {/* Left Column: Conversational Purchasing Agent */}
+          {/* Left Column: Conversational Purchasing Agent (5 Cols) */}
           <div className="lg:col-span-5">
             <AgentChat onOrderExecuted={fetchLedger} />
           </div>
 
-          {/* Right Column: AG Grid Ledger & Technical Transparency */}
-          <div className="lg:col-span-7 space-y-6">
+          {/* Right Column: AG Grid Ledger & Architecture Panel (7 Cols) */}
+          <div className="lg:col-span-7 space-y-5">
             <LedgerGrid
               transactions={transactions}
               isLoading={isLoadingLedger}
               onRefresh={fetchLedger}
             />
 
-            {/* Technical Integration Highlights */}
-            <div className="bg-slate-900/40 border border-slate-800/80 rounded-xl p-4">
-              <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2 flex items-center gap-1.5">
-                <Cpu className="w-4 h-4 text-sky-400" />
-                <span>Architecture & Hackathon Track Alignment</span>
-              </h4>
+            {/* Hackathon Architecture & Track Alignment Panel */}
+            <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-4 shadow-lg backdrop-blur-sm">
+              <div className="flex items-center justify-between mb-3">
+                <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
+                  <Cpu className="w-3.5 h-3.5 text-sky-400" />
+                  <span>Hackathon Sponsor Integrations & Architecture</span>
+                </h4>
+                <span className="text-[10px] text-slate-500 font-medium">All systems active</span>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
-                <div className="p-3 rounded-lg bg-slate-900/80 border border-slate-800">
-                  <div className="font-semibold text-blue-400 flex items-center justify-between">
+                {/* Track 1: PayPal AI */}
+                <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/90 hover:border-slate-700 transition">
+                  <div className="font-bold text-sky-400 flex items-center justify-between text-xs">
                     <span>PayPal AI Toolkit</span>
-                    <CheckCircle2 className="w-3.5 h-3.5 text-blue-400" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-sky-400" />
                   </div>
-                  <p className="text-slate-400 text-[11px] mt-1">
-                    Uses `@paypal/agent-toolkit` actions: `create_order`, `create_invoice`, and `get_shipment_tracking`.
+                  <p className="text-slate-400 text-[11px] mt-1.5 leading-relaxed">
+                    Uses official <code className="text-sky-300 bg-slate-900 px-1 py-0.5 rounded font-mono">@paypal/agent-toolkit</code> for autonomous <code className="text-slate-300">create_order</code> & <code className="text-slate-300">create_invoice</code> execution.
                   </p>
                 </div>
 
-                <div className="p-3 rounded-lg bg-slate-900/80 border border-slate-800">
-                  <div className="font-semibold text-emerald-400 flex items-center justify-between">
-                    <span>AG Grid Integration</span>
+                {/* Track 2: AG Grid */}
+                <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/90 hover:border-slate-700 transition">
+                  <div className="font-bold text-emerald-400 flex items-center justify-between text-xs">
+                    <span>AG Grid Ledger</span>
                     <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                   </div>
-                  <p className="text-slate-400 text-[11px] mt-1">
-                    Powers the enterprise audit ledger with real-time status binding, sort, filter, and theme customization.
+                  <p className="text-slate-400 text-[11px] mt-1.5 leading-relaxed">
+                    Enterprise data grid with Quartz Dark theme, status cell renderers, and live row selection for order manifests.
                   </p>
                 </div>
 
-                <div className="p-3 rounded-lg bg-slate-900/80 border border-slate-800">
-                  <div className="font-semibold text-purple-400 flex items-center justify-between">
+                {/* Track 3: Channel3 MCP */}
+                <div className="p-3.5 rounded-xl bg-slate-950/70 border border-slate-800/90 hover:border-slate-700 transition">
+                  <div className="font-bold text-indigo-400 flex items-center justify-between text-xs">
                     <span>Channel3 MCP Catalog</span>
-                    <CheckCircle2 className="w-3.5 h-3.5 text-purple-400" />
+                    <CheckCircle2 className="w-3.5 h-3.5 text-indigo-400" />
                   </div>
-                  <p className="text-slate-400 text-[11px] mt-1">
-                    Discovers inventory across 100M+ real retailer SKUs to optimize bundles and calculate B2B volume discounts.
+                  <p className="text-slate-400 text-[11px] mt-1.5 leading-relaxed">
+                    Searches 100M+ real retailer SKUs across authorized suppliers with B2B volume pricing and delivery schedules.
                   </p>
                 </div>
               </div>
@@ -111,7 +118,7 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-slate-800/80 py-4 mt-8 bg-slate-950/60 text-center text-xs text-slate-500">
+      <footer className="border-t border-slate-800/80 py-4 mt-8 bg-slate-950/80 text-center text-xs text-slate-500">
         <p>Built for the <strong>Build What&apos;s Next with PayPal and AI</strong> Global Hackathon</p>
       </footer>
     </div>
