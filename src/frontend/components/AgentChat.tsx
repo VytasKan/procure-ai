@@ -73,6 +73,44 @@ export const AgentChat: React.FC<AgentChatProps> = ({ onOrderExecuted }) => {
     }
   };
 
+  const renderFormattedContent = (content: string) => {
+    // Process markdown-like formatting: bold, bullet points, headers
+    const lines = content.split('\n');
+    return (
+      <div className="space-y-1.5 leading-relaxed text-xs">
+        {lines.map((line, idx) => {
+          if (!line.trim()) return <div key={idx} className="h-1" />;
+          
+          // Format bullet points
+          if (line.startsWith('• ') || line.startsWith('* ')) {
+            const text = line.substring(2);
+            return (
+              <div key={idx} className="flex items-start gap-1.5 pl-1 text-slate-200">
+                <span className="text-sky-400 font-bold shrink-0">•</span>
+                <span>{renderInlineBold(text)}</span>
+              </div>
+            );
+          }
+
+          return <p key={idx}>{renderInlineBold(line)}</p>;
+        })}
+      </div>
+    );
+  };
+
+  const renderInlineBold = (text: string) => {
+    const parts = text.split(/(\*\*.*?\*\*|`.*?`)/g);
+    return parts.map((part, i) => {
+      if (part.startsWith('**') && part.endsWith('**')) {
+        return <strong key={i} className="font-semibold text-white">{part.slice(2, -2)}</strong>;
+      }
+      if (part.startsWith('`') && part.endsWith('`')) {
+        return <code key={i} className="font-mono text-[11px] px-1.5 py-0.5 rounded bg-slate-900 border border-slate-700 text-sky-300">{part.slice(1, -1)}</code>;
+      }
+      return part;
+    });
+  };
+
   const handleApproveQuote = async (quote: ProcurementQuote) => {
     try {
       const res = await fetch('/api/execute', {
@@ -134,8 +172,8 @@ export const AgentChat: React.FC<AgentChatProps> = ({ onOrderExecuted }) => {
             )}
 
             <div className={`max-w-[85%] ${msg.role === 'user' ? 'bg-blue-600 text-white rounded-2xl rounded-tr-sm px-4 py-2.5 text-xs' : 'bg-slate-800/80 text-slate-200 rounded-2xl rounded-tl-sm p-4 text-xs border border-slate-700/60'}`}>
-              <div className="whitespace-pre-wrap leading-relaxed">
-                {msg.content}
+              <div className="leading-relaxed">
+                {renderFormattedContent(msg.content)}
               </div>
 
               {/* Embed Quote Approval Card if quote exists */}

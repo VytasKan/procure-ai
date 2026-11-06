@@ -16,7 +16,7 @@ interface MetricsBarProps {
 
 export const MetricsBar: React.FC<MetricsBarProps> = ({ metrics }) => {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
       {/* Metric 1: Total Spend */}
       <div className="bg-slate-900/70 border border-slate-800 rounded-xl p-4 relative overflow-hidden">
         <div className="flex items-center justify-between">

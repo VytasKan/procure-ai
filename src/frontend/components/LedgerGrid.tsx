@@ -2,8 +2,10 @@
 
 import React, { useMemo, useState } from 'react';
 import { AgGridReact } from 'ag-grid-react';
-import { ColDef, ICellRendererParams, RowClickedEvent } from 'ag-grid-community';
+import { ModuleRegistry, AllCommunityModule, ColDef, ICellRendererParams, RowClickedEvent } from 'ag-grid-community';
 import { LedgerTransaction } from '@/backend/types';
+
+ModuleRegistry.registerModules([AllCommunityModule]);
 import { formatCurrency, formatDate, getStatusBadgeClass } from '../utils/formatters';
 import { ExternalLink, RefreshCw } from 'lucide-react';
 import { OrderDetailsModal } from './OrderDetailsModal';
@@ -156,7 +158,10 @@ export const LedgerGrid: React.FC<LedgerGridProps> = ({
         </div>
 
         {/* The AG Grid Table */}
-        <div className="ag-theme-quartz-dark w-full h-[360px] rounded-lg overflow-hidden border border-slate-800">
+        <div 
+          className="ag-theme-quartz-dark w-full rounded-lg overflow-hidden border border-slate-800"
+          style={{ height: '380px', width: '100%' }}
+        >
           <AgGridReact<LedgerTransaction>
             rowData={transactions}
             columnDefs={columnDefs}
