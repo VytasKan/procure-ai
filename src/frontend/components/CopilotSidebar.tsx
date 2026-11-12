@@ -2,7 +2,9 @@
 
 import React from 'react';
 import { AgentChat } from './AgentChat';
-import { Bot, X } from 'lucide-react';
+import { Shield, X } from 'lucide-react';
+
+import { LedgerTransaction } from '@/backend/types';
 
 interface CopilotSidebarProps {
   isOpen: boolean;
@@ -11,6 +13,9 @@ interface CopilotSidebarProps {
   externalPrompt?: string;
   onClearExternalPrompt?: () => void;
   currentThreshold: number;
+  enforceCollateral?: boolean;
+  autoSlaSlashing?: boolean;
+  transactions?: LedgerTransaction[];
 }
 
 export const CopilotSidebar: React.FC<CopilotSidebarProps> = ({
@@ -19,7 +24,10 @@ export const CopilotSidebar: React.FC<CopilotSidebarProps> = ({
   onOrderExecuted,
   externalPrompt,
   onClearExternalPrompt,
-  currentThreshold
+  currentThreshold,
+  enforceCollateral = true,
+  autoSlaSlashing = true,
+  transactions = []
 }) => {
   if (!isOpen) return null;
 
@@ -28,22 +36,22 @@ export const CopilotSidebar: React.FC<CopilotSidebarProps> = ({
       {/* Sidebar Header */}
       <div className="p-3.5 border-b border-slate-200 flex items-center justify-between bg-white">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#0070ba] to-blue-600 flex items-center justify-center text-white shadow-xs">
-            <Bot className="w-4 h-4 text-white" />
+          <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-700 to-indigo-600 flex items-center justify-center text-white shadow-xs">
+            <Shield className="w-4 h-4 text-white" />
           </div>
           <div>
             <h3 className="text-xs font-bold text-slate-900 tracking-tight flex items-center gap-1.5">
-              <span>ProcureAI Copilot</span>
+              <span>ProcureAI Buyer Console</span>
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             </h3>
-            <p className="text-[10px] text-slate-500">Autonomous Commercial Purchasing Agent</p>
+            <p className="text-[10px] text-slate-500 font-mono">agent://treasury-prime.eth</p>
           </div>
         </div>
 
         <button
           onClick={onClose}
           className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 flex items-center justify-center transition cursor-pointer"
-          title="Collapse Copilot Sidebar"
+          title="Collapse Buyer Console"
         >
           <X className="w-3.5 h-3.5" />
         </button>
@@ -56,6 +64,9 @@ export const CopilotSidebar: React.FC<CopilotSidebarProps> = ({
           externalPrompt={externalPrompt}
           onClearExternalPrompt={onClearExternalPrompt}
           currentThreshold={currentThreshold}
+          enforceCollateral={enforceCollateral}
+          autoSlaSlashing={autoSlaSlashing}
+          transactions={transactions}
         />
       </div>
     </aside>

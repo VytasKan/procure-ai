@@ -1,58 +1,39 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PayPalService } from '@/backend/services/paypal-client';
 import { ledgerStore } from '@/backend/services/ledger-store';
-import { ProcurementQuote } from '@/backend/types';
+import { AgentServiceContract } from '@/backend/types';
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { quote, department, requestedBy } = body as {
-      quote: ProcurementQuote;
-      department?: string;
-      requestedBy?: string;
+    const { contract } = body as {
+      contract: AgentServiceContract;
     };
 
-    if (!quote || !quote.items || quote.items.length === 0) {
-      return NextResponse.json({ error: 'Valid quote payload is required' }, { status: 400 });
+    if (!contract || !contract.contractId || !contract.sellerAgent) {
+      return NextResponse.json({ error: 'Valid agent service contract payload is required' }, { status: 400 });
     }
 
-    let paypalResult: { id: string; url?: string; type: 'ORDER' | 'INVOICE' };
-
-    if (quote.paymentMethod === 'PAYPAL_INVOICE') {
-      const inv = await PayPalService.createInvoice(quote);
-      paypalResult = {
-        id: inv.id,
-        url: inv.invoiceUrl,
-        type: 'INVOICE'
-      };
+    let settlement;
+    if (contract.trustEvaluation?.route === 'CONDITIONAL_ESCROW' || contract.requiresEscrow) {
+      settlement = await PayPalService.createEscrowHold(contract);
     } else {
-      const ord = await PayPalService.createOrder(quote);
-      paypalResult = {
-        id: ord.id,
-        url: ord.approveUrl,
-        type: 'ORDER'
-      };
+      settlement = await PayPalService.createDirectSettlement(contract);
     }
 
-    // Save into the AG Grid ledger
-    const newTx = ledgerStore.addFromQuote(
-      quote,
-      paypalResult,
-      department || 'Engineering Ops',
-      requestedBy || 'ProcureAI Agent'
-    );
+    // Save into the AG Grid Trust & Escrow ledger
+    const newTx = ledgerStore.addFromContract(contract, settlement);
 
     return NextResponse.json({
       success: true,
       transaction: newTx,
-      paypalResult
+      settlement
     });
   } catch (error) {
     console.error('Execution route error:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Failed to execute PayPal transaction' },
+      { error: error instanceof Error ? error.message : 'Failed to execute A2A transaction' },
       { status: 500 }
     );
   }
 }
-

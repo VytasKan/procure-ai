@@ -1,3 +1,6 @@
+@import 'ag-grid-community/styles/ag-grid.css';
+@import 'ag-grid-community/styles/ag-theme-quartz.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -16,28 +19,50 @@ body {
   letter-spacing: -0.011em;
 }
 
+/* Tailwind v3 compatibility utilities */
+.shadow-xs, .shadow-2xs {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 /* Polished AG Grid Light Quartz Theme */
 .ag-theme-quartz {
   --ag-background-color: #ffffff !important;
   --ag-header-background-color: #f8fafc !important;
   --ag-odd-row-background-color: #ffffff !important;
-  --ag-row-hover-color: #f1f5f9 !important;
-  --ag-selected-row-background-color: #eff6ff !important;
-  --ag-border-color: #e2e8f0 !important;
-  --ag-secondary-border-color: #e2e8f0 !important;
-  --ag-header-foreground-color: #475569 !important;
+  --ag-row-hover-color: #f8fafc !important;
+  --ag-selected-row-background-color: #f0f7ff !important;
+  --ag-border-color: #f1f5f9 !important;
+  --ag-secondary-border-color: #f1f5f9 !important;
+  --ag-header-foreground-color: #64748b !important;
   --ag-foreground-color: #0f172a !important;
   --ag-data-color: #0f172a !important;
   --ag-font-family: inherit !important;
-  --ag-font-size: 12px !important;
-  --ag-cell-horizontal-border: solid #f1f5f9 !important;
-  --ag-cell-horizontal-padding: 12px !important;
+  --ag-font-size: 13px !important;
+  --ag-cell-horizontal-border: solid #f8fafc !important;
+  --ag-cell-horizontal-padding: 16px !important;
 }
 
 .ag-theme-quartz .ag-root-wrapper {
   background-color: #ffffff !important;
-  border: 1px solid #e2e8f0 !important;
-  border-radius: 0.75rem !important;
+  border: none !important;
+  border-radius: 0 !important;
 }
 
 .ag-theme-quartz .ag-header {
@@ -46,33 +71,77 @@ body {
 }
 
 .ag-theme-quartz .ag-header-cell {
-  color: #475569 !important;
-  font-weight: 700 !important;
+  color: #64748b !important;
+  font-weight: 600 !important;
   font-size: 11px !important;
   text-transform: uppercase !important;
-  letter-spacing: 0.05em !important;
+  letter-spacing: 0.04em !important;
+}
+
+/* Subtle, clean filter input in floating filter row */
+.ag-theme-quartz .ag-floating-filter-input {
+  background-color: #ffffff !important;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 6px !important;
+  font-size: 11px !important;
+  color: #334155 !important;
+  transition: all 0.15s ease !important;
+}
+
+.ag-theme-quartz .ag-floating-filter-input:focus-within {
+  border-color: #3b82f6 !important;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.1) !important;
+  outline: none !important;
+}
+
+.ag-theme-quartz .ag-floating-filter-button-wrapper button {
+  color: #94a3b8 !important;
+  transition: color 0.15s ease !important;
+}
+
+.ag-theme-quartz .ag-floating-filter-button-wrapper button:hover {
+  color: #334155 !important;
 }
 
 .ag-theme-quartz .ag-row {
   background-color: #ffffff !important;
   color: #0f172a !important;
   border-bottom: 1px solid #f1f5f9 !important;
-  transition: background-color 0.15s ease !important;
+  transition: background-color 0.12s ease !important;
 }
 
-.ag-theme-quartz .ag-row:hover {
+/* Disable column hover highlight on pinned rows and headers */
+.ag-theme-quartz .ag-row-pinned .ag-cell,
+.ag-theme-quartz .ag-row-pinned.ag-row {
+  background-color: #f8fafc !important;
+  border-top: 1px solid #e2e8f0 !important;
+}
+
+.ag-theme-quartz .ag-row-pinned:hover,
+.ag-theme-quartz .ag-row-pinned .ag-cell:hover,
+.ag-theme-quartz .ag-row-pinned .ag-column-hover {
+  background-color: #f8fafc !important;
+}
+
+/* Subtle column hover on regular body data rows only */
+.ag-theme-quartz .ag-row:not(.ag-row-pinned) .ag-column-hover {
   background-color: #f8fafc !important;
 }
 
 .ag-theme-quartz .ag-paging-panel {
-  background-color: #f8fafc !important;
-  color: #475569 !important;
-  border-top: 1px solid #e2e8f0 !important;
-  font-size: 11px !important;
+  background-color: #ffffff !important;
+  color: #64748b !important;
+  border-top: 1px solid #f1f5f9 !important;
+  font-size: 12px !important;
+  padding: 8px 16px !important;
 }
 
 .ag-theme-quartz .ag-paging-button {
-  color: #475569 !important;
+  color: #64748b !important;
+}
+
+.ag-theme-quartz .ag-checkbox-input-wrapper.ag-checked::after {
+  color: #2563eb !important;
 }
 
 /* Custom Scrollbars */

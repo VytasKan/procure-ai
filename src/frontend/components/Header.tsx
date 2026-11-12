@@ -1,106 +1,154 @@
 'use client';
 
 import React from 'react';
-import { Bot, Sparkles, ShoppingBag, ShieldAlert, ChevronRight, PanelRightClose, PanelRightOpen } from 'lucide-react';
+import { 
+  Shield, 
+  ShieldAlert, 
+  Activity, 
+  Bot, 
+  Building2, 
+  Zap,
+  CheckCircle2
+} from 'lucide-react';
 
 interface HeaderProps {
   onOpenDiagnostics: () => void;
-  onOpenCatalog: () => void;
   onOpenPolicy: () => void;
   currentThreshold: number;
   isCopilotOpen: boolean;
   onToggleCopilot: () => void;
+  activePersona: 'buyer' | 'backend' | 'simulation';
+  onPersonaChange: (persona: 'buyer' | 'backend' | 'simulation') => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({
   onOpenDiagnostics,
-  onOpenCatalog,
   onOpenPolicy,
   currentThreshold,
   isCopilotOpen,
-  onToggleCopilot
+  onToggleCopilot,
+  activePersona,
+  onPersonaChange
 }) => {
   return (
-    <header className="border-b border-slate-200 bg-white/95 backdrop-blur-md sticky top-0 z-40 shadow-xs">
-      <div className="w-full px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* Brand Logo & Name */}
-        <div className="flex items-center space-x-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-[#0070ba] to-blue-600 p-[1px] shadow-sm shadow-blue-500/20">
-            <div className="w-full h-full bg-blue-600 rounded-[11px] flex items-center justify-center text-white">
-              <Bot className="w-5 h-5 text-white" />
-            </div>
+    <header className="border-b border-slate-200/90 bg-white/95 backdrop-blur-md sticky top-0 z-40 shadow-xs">
+      <div className="w-full px-3 sm:px-6 h-14 flex items-center justify-between gap-2 sm:gap-4 overflow-hidden">
+        
+        {/* Left: Brand Logo & Title */}
+        <div className="flex items-center gap-2.5 shrink-0">
+          <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-blue-700 via-indigo-600 to-blue-600 flex items-center justify-center text-white shrink-0 shadow-xs">
+            <Shield className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-white" />
           </div>
-          <div>
-            <div className="flex items-center space-x-2">
-              <span className="text-lg font-black tracking-tight text-slate-900">
-                ProcureAI
-              </span>
-              <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                Agentic B2B
-              </span>
-            </div>
-            <p className="text-[11px] text-slate-500 font-medium hidden sm:block">
-              Autonomous Commercial Procurement & PayPal Settlement
-            </p>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-extrabold tracking-tight text-slate-900">
+              ProcureAI
+            </span>
+            <span className="text-[10px] font-mono font-bold text-blue-700 bg-blue-50/80 px-1.5 sm:px-2 py-0.5 rounded-md border border-blue-200/70 shrink-0">
+              Master Distributor
+            </span>
+            <span className="hidden 2xl:inline-block text-slate-200 font-light">|</span>
+            <span className="text-xs text-slate-500 font-normal hidden 2xl:inline-block truncate max-w-xs">
+              Autonomous B2B Merchant of Record
+            </span>
           </div>
         </div>
 
-        {/* Action Controls & Live State */}
-        <div className="flex items-center space-x-2.5">
-          {/* Policy Guardrails Button */}
+        {/* Center: Clean Segmented Mode Switcher */}
+        <div className="flex items-center bg-slate-100/90 p-0.5 sm:p-1 rounded-xl border border-slate-200/90 shadow-2xs shrink-0">
           <button
-            onClick={onOpenPolicy}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-slate-50 hover:bg-slate-100 border border-slate-200 text-xs text-slate-700 transition cursor-pointer shadow-xs"
-            title="Configure spending guardrails"
+            onClick={() => onPersonaChange('buyer')}
+            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer whitespace-nowrap ${
+              activePersona === 'buyer'
+                ? 'bg-white text-blue-700 shadow-xs border border-slate-200/80'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
           >
-            <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
-            <span className="hidden md:inline font-medium">Policy Cap:</span>
-            <span className="text-blue-700 font-mono font-bold">${currentThreshold}</span>
+            <Bot className={`w-3.5 h-3.5 ${activePersona === 'buyer' ? 'text-blue-600' : 'text-slate-500'}`} />
+            <span>Buyer Portal</span>
+            <span className={`text-[10px] px-1.5 py-0.2 rounded font-mono font-bold hidden xl:inline-block ${
+              activePersona === 'buyer' ? 'bg-blue-50 text-blue-700' : 'bg-slate-200/80 text-slate-500'
+            }`}>
+              Acme Bot
+            </span>
           </button>
 
-          {/* Catalog Browser Button */}
           <button
-            onClick={onOpenCatalog}
-            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 text-xs font-semibold text-purple-700 transition cursor-pointer shadow-xs"
-            title="Inspect Channel3 multi-merchant catalog"
+            onClick={() => onPersonaChange('backend')}
+            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer whitespace-nowrap ${
+              activePersona === 'backend'
+                ? 'bg-white text-indigo-700 shadow-xs border border-slate-200/80'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
           >
-            <ShoppingBag className="w-3.5 h-3.5 text-purple-600" />
-            <span className="hidden sm:inline">Channel3 Catalog</span>
+            <Building2 className={`w-3.5 h-3.5 ${activePersona === 'backend' ? 'text-indigo-600' : 'text-slate-500'}`} />
+            <span>Backend Ops</span>
+            <span className={`text-[10px] px-1.5 py-0.2 rounded font-mono font-bold hidden xl:inline-block ${
+              activePersona === 'backend' ? 'bg-indigo-50 text-indigo-700' : 'bg-slate-200/80 text-slate-500'
+            }`}>
+              Settlement
+            </span>
           </button>
 
-          {/* PayPal Diagnostics Button */}
+          <button
+            onClick={() => onPersonaChange('simulation')}
+            className={`flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold transition cursor-pointer whitespace-nowrap ${
+              activePersona === 'simulation'
+                ? 'bg-white text-amber-800 shadow-xs border border-slate-200/80'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <Zap className={`w-3.5 h-3.5 ${activePersona === 'simulation' ? 'text-amber-600 fill-amber-500' : 'text-slate-500'}`} />
+            <span>Simulator</span>
+            <span className={`text-[10px] px-1.5 py-0.2 rounded font-mono font-bold ${
+              activePersona === 'simulation' ? 'bg-amber-100 text-amber-800' : 'bg-slate-200/80 text-slate-500'
+            }`}>
+              Live
+            </span>
+          </button>
+        </div>
+
+        {/* Right: Status Pill & Actions */}
+        <div className="flex items-center gap-2 shrink-0">
+          {/* Buyer Mode: Daily Cap Widget */}
+          {activePersona === 'buyer' && (
+            <div className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-50 border border-slate-200/90 text-xs shrink-0">
+              <span className="text-[10px] uppercase font-mono font-bold text-slate-400">Cap:</span>
+              <span className="font-mono font-bold text-slate-800">$500</span>
+              <span className="text-slate-300">|</span>
+              <span className="text-[10px] uppercase font-mono font-bold text-emerald-600">Left:</span>
+              <span className="font-mono font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200">
+                $450
+              </span>
+            </div>
+          )}
+
+          {/* Trust Threshold Gate Button (Backend only) */}
+          {activePersona === 'backend' && (
+            <button
+              onClick={onOpenPolicy}
+              className="hidden xl:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl hover:bg-slate-50 border border-slate-200/90 text-xs text-slate-600 transition cursor-pointer shadow-2xs shrink-0"
+              title="Configure Minimum Counterparty Trust Threshold"
+            >
+              <ShieldAlert className="w-3.5 h-3.5 text-blue-600" />
+              <span className="font-normal text-slate-500">Gate:</span>
+              <span className="font-mono font-bold text-slate-900">&ge; {currentThreshold}</span>
+            </button>
+          )}
+
+          {/* PayPal Sandbox Status Badge */}
           <button
             onClick={onOpenDiagnostics}
-            className="flex items-center space-x-2 px-3 py-1.5 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 text-xs font-semibold text-emerald-800 transition cursor-pointer shadow-xs"
+            className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl bg-emerald-50/70 hover:bg-emerald-50 border border-emerald-200/80 text-xs font-semibold text-emerald-800 transition cursor-pointer shadow-2xs shrink-0"
             title="View PayPal Sandbox connection details"
           >
-            <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-xs" />
-            <span>PayPal Sandbox Live</span>
-          </button>
-
-          {/* AI Copilot Toggle Button */}
-          <button
-            onClick={onToggleCopilot}
-            className={`flex items-center space-x-1.5 px-3.5 py-1.5 rounded-xl text-xs font-bold transition cursor-pointer shadow-xs ${
-              isCopilotOpen
-                ? 'bg-[#0070ba] hover:bg-[#003087] text-white shadow-blue-500/20'
-                : 'bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200'
-            }`}
-            title="Toggle AI Copilot Sidebar"
-          >
-            {isCopilotOpen ? (
-              <>
-                <PanelRightClose className="w-3.5 h-3.5" />
-                <span>Hide Copilot</span>
-              </>
-            ) : (
-              <>
-                <PanelRightOpen className="w-3.5 h-3.5 text-blue-600" />
-                <span>AI Copilot</span>
-              </>
-            )}
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+            <span className="hidden sm:inline">PayPal Sandbox</span>
+            <span className="text-[10px] font-mono font-bold text-emerald-700 bg-emerald-100/70 px-1.5 py-0.5 rounded">
+              Orders v2
+            </span>
           </button>
         </div>
+
       </div>
     </header>
   );

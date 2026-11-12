@@ -14,8 +14,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "ProcureAI — Autonomous B2B Procurement & PayPal Settlement",
-  description: "Autonomous commercial purchasing agent powered by PayPal AI Toolkit, Channel3, and AG Grid.",
+  title: "ProcureAI — Autonomous B2B Master Distributor & PayPal Escrow",
+  description: "Autonomous B2B commerce & escrow settlement for AI agents. Sourcing wholesale goods on Channel3, securing orders in PayPal escrow, and giving enterprises audit clarity with AG Grid.",
 };
 
 export default function RootLayout({

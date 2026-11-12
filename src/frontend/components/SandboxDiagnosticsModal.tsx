@@ -1,16 +1,18 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { X, CheckCircle2, Activity, ExternalLink } from 'lucide-react';
+import { X, CheckCircle2, Activity, ExternalLink, Lock, RotateCcw } from 'lucide-react';
 
 interface SandboxDiagnosticsModalProps {
   isOpen: boolean;
   onClose: () => void;
+  currentThreshold?: number;
 }
 
 export const SandboxDiagnosticsModal: React.FC<SandboxDiagnosticsModalProps> = ({
   isOpen,
-  onClose
+  onClose,
+  currentThreshold = 75
 }) => {
   const [healthData, setHealthData] = useState<any>(null);
 
@@ -40,17 +42,19 @@ export const SandboxDiagnosticsModal: React.FC<SandboxDiagnosticsModalProps> = (
         {/* Header */}
         <div className="p-5 border-b border-slate-200 bg-slate-50 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-[#0070ba]">
-              <Activity className="w-5 h-5 text-[#0070ba]" />
+            <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
+              <Activity className="w-5 h-5 text-blue-600" />
             </div>
             <div>
               <h3 className="text-base font-bold text-slate-900 tracking-tight flex items-center gap-2">
-                <span>PayPal Developer Diagnostics</span>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  Sandbox Active
+                <span>PayPal Escrow & Diagnostics Engine</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-semibold border ${
+                  healthData?.sandboxPing?.ok ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-blue-50 text-blue-700 border-blue-200'
+                }`}>
+                  {healthData?.sandboxPing?.ok ? 'Live Sandbox Connected' : 'Simulated Sandbox Mode'}
                 </span>
               </h3>
-              <p className="text-xs text-slate-500">Environment connectivity, OAuth2 status & toolkit inspect</p>
+              <p className="text-xs text-slate-500 font-mono">POST /v2/checkout/orders [intent: AUTHORIZE/CAPTURE]</p>
             </div>
           </div>
 
@@ -67,47 +71,55 @@ export const SandboxDiagnosticsModal: React.FC<SandboxDiagnosticsModalProps> = (
           {/* Connection Status Banner */}
           <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="w-3 h-3 rounded-full bg-emerald-500 animate-pulse shadow-xs" />
+              <div className={`w-3 h-3 rounded-full ${healthData?.sandboxPing?.ok ? 'bg-emerald-500 animate-pulse' : 'bg-blue-500'} shadow-xs`} />
               <div>
-                <span className="text-slate-900 font-bold text-xs">Sandbox REST Gateway</span>
-                <p className="text-[11px] text-slate-500 font-mono">https://api-m.sandbox.paypal.com</p>
+                <span className="text-slate-900 font-bold text-xs">
+                  {healthData?.sandboxPing?.ok ? 'Sandbox REST Gateway' : 'Deterministic Sandbox Engine'}
+                </span>
+                <p className="text-[11px] text-slate-500 font-mono">
+                  {healthData?.sandboxPing?.ok ? 'https://api-m.sandbox.paypal.com' : 'Local Deterministic Provider'}
+                </p>
               </div>
             </div>
 
             <div className="text-right">
-              <span className="text-[11px] font-semibold text-emerald-700 font-mono">200 OK</span>
-              <p className="text-[10px] text-slate-400">Latency: ~48ms</p>
+              <span className={`text-[11px] font-semibold font-mono ${healthData?.sandboxPing?.ok ? 'text-emerald-700' : 'text-blue-700'}`}>
+                {healthData?.sandboxPing?.ok ? '200 OK' : 'ACTIVE'}
+              </span>
+              <p className="text-[10px] text-slate-400">
+                {healthData?.sandboxPing?.ok ? `Latency: ~${healthData?.sandboxPing?.latencyMs || 42}ms` : 'Simulated Response'}
+              </p>
             </div>
           </div>
 
           {/* Active Endpoints Grid */}
           <div>
             <h4 className="text-[11px] font-bold text-slate-600 uppercase tracking-wider mb-2">
-              Integrated PayPal APIs (@paypal/agent-toolkit)
+              Load-Bearing A2A Escrow Endpoints
             </h4>
             <div className="space-y-2">
               <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between font-mono text-[11px]">
                 <div className="flex items-center gap-2">
-                  <span className="text-blue-700 font-bold text-[10px] bg-blue-50 border border-blue-200 px-1.5 py-0.5 rounded">POST</span>
-                  <span className="text-slate-800">/v2/checkout/orders</span>
+                  <span className="text-amber-800 font-bold text-[10px] bg-amber-50 border border-amber-200 px-1.5 py-0.5 rounded">AUTHORIZE</span>
+                  <span className="text-slate-800">POST /v2/checkout/orders</span>
                 </div>
-                <span className="text-slate-500 text-[10px]">Orders & Payments</span>
+                <span className="text-amber-700 font-semibold text-[10px]">Conditional Escrow</span>
               </div>
 
               <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between font-mono text-[11px]">
                 <div className="flex items-center gap-2">
-                  <span className="text-indigo-700 font-bold text-[10px] bg-indigo-50 border border-indigo-200 px-1.5 py-0.5 rounded">POST</span>
-                  <span className="text-slate-800">/v2/invoicing/invoices</span>
+                  <span className="text-blue-700 font-bold text-[10px] bg-blue-50 border border-blue-200 px-1.5 py-0.5 rounded">CAPTURE</span>
+                  <span className="text-slate-800">POST /v2/payments/authorizations/&#123;id&#125;/capture</span>
                 </div>
-                <span className="text-slate-500 text-[10px]">Net-15 B2B Invoicing</span>
+                <span className="text-blue-700 font-semibold text-[10px]">Release Funds</span>
               </div>
 
               <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between font-mono text-[11px]">
                 <div className="flex items-center gap-2">
-                  <span className="text-emerald-700 font-bold text-[10px] bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">GET</span>
-                  <span className="text-slate-800">/v1/shipping/trackers</span>
+                  <span className="text-rose-700 font-bold text-[10px] bg-rose-50 border border-rose-200 px-1.5 py-0.5 rounded">REFUND</span>
+                  <span className="text-slate-800">POST /v2/payments/captures/&#123;id&#125;/refund</span>
                 </div>
-                <span className="text-slate-500 text-[10px]">Shipment Tracking</span>
+                <span className="text-rose-700 font-semibold text-[10px]">Dispute Restitution</span>
               </div>
             </div>
           </div>
@@ -116,30 +128,23 @@ export const SandboxDiagnosticsModal: React.FC<SandboxDiagnosticsModalProps> = (
           <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
             <div className="flex justify-between">
               <span className="text-slate-600">Environment Mode:</span>
-              <span className="font-mono text-[#0070ba] font-bold">{healthData?.environment || 'SANDBOX'}</span>
+              <span className="font-mono text-blue-700 font-bold">{healthData?.environment || 'SANDBOX'}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-600">Auto-Approval Guardrail:</span>
-              <span className="font-mono text-emerald-700 font-bold">${healthData?.autoApproveThreshold || '350.00'} USD</span>
+              <span className="text-slate-600">Trust Score Gate:</span>
+              <span className="font-mono text-emerald-700 font-bold">Score &ge; {currentThreshold}/100</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-slate-600">Corporate Account:</span>
-              <span className="font-medium text-slate-900">{healthData?.company || 'Acme Tech Labs Inc.'}</span>
+              <span className="text-slate-600">Buyer Agent Handle:</span>
+              <span className="font-mono font-medium text-slate-900">{healthData?.buyerAgentId || 'agent://treasury-prime.eth'}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-600">OAuth Credentials:</span>
-              <span className="text-emerald-700 font-semibold flex items-center gap-1">
+              <span className={`font-semibold flex items-center gap-1 ${healthData?.hasPayPalCredentials ? 'text-emerald-700' : 'text-blue-700'}`}>
                 <CheckCircle2 className="w-3.5 h-3.5" />
-                <span>Simulated Sandbox & Live Ready</span>
+                <span>{healthData?.hasPayPalCredentials ? 'Sandbox Verified' : 'Simulated Sandbox Mode'}</span>
               </span>
             </div>
-          </div>
-
-          {/* Hackathon Notes */}
-          <div className="p-3 rounded-lg bg-blue-50/70 border border-blue-200 text-[11px] text-slate-700 leading-relaxed">
-            <p>
-              💡 <strong>Judge Note:</strong> To test against your own PayPal developer account, add <code className="text-[#0070ba] font-mono">PAYPAL_CLIENT_ID</code> and <code className="text-[#0070ba] font-mono">PAYPAL_CLIENT_SECRET</code> to <code className="text-[#0070ba] font-mono">.env.local</code>. ProcureAI will automatically authenticate live OAuth2 tokens with PayPal Sandbox.
-            </p>
           </div>
         </div>
 
@@ -149,7 +154,7 @@ export const SandboxDiagnosticsModal: React.FC<SandboxDiagnosticsModalProps> = (
             href="https://developer.paypal.com/dashboard/"
             target="_blank"
             rel="noreferrer"
-            className="text-xs text-[#0070ba] hover:underline flex items-center gap-1 font-semibold"
+            className="text-xs text-blue-700 hover:underline flex items-center gap-1 font-semibold"
           >
             <span>Open PayPal Developer Dashboard</span>
             <ExternalLink className="w-3.5 h-3.5" />
@@ -157,7 +162,7 @@ export const SandboxDiagnosticsModal: React.FC<SandboxDiagnosticsModalProps> = (
 
           <button
             onClick={onClose}
-            className="px-4 py-2 rounded-xl bg-[#0070ba] hover:bg-[#003087] text-xs font-semibold text-white transition cursor-pointer shadow-xs"
+            className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-xs font-semibold text-white transition cursor-pointer shadow-xs"
           >
             Close Diagnostics
           </button>
